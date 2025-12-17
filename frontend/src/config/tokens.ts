@@ -20,19 +20,18 @@ export const TOKENS: Token[] = [
     name: 'Token B',
     decimals: 18,
   },
-  // 部署新代币后在这里添加
-  // {
-  //   address: '0x...',
-  //   symbol: 'TKC',
-  //   name: 'Token C',
-  //   decimals: 18,
-  // },
-  // {
-  //   address: '0x...',
-  //   symbol: 'TKD',
-  //   name: 'Token D',
-  //   decimals: 18,
-  // },
+  {
+    address: '0x0e9150b7ae7587Fb509Ba585268fc379C1da79Ba',
+    symbol: 'TKC',
+    name: 'Token C',
+    decimals: 18,
+  },
+  {
+    address: '0x2141b1565C5d1FF548Cb81d53b8B3F09A1099651',
+    symbol: 'TKD',
+    name: 'Token D',
+    decimals: 18,
+  },
 ];
 
 // 根据地址获取代币信息

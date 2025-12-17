@@ -2,29 +2,35 @@ import { useState } from 'react';
 import { useAccount, useReadContracts, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
 import { parseUnits } from 'viem';
 import { CONTRACTS, ERC20_ABI, ROUTER_ABI } from '../config/contracts';
+import { TOKENS } from '../config/tokens';
 
 export function AddLiquidity() {
   const { address } = useAccount();
   const [amountA, setAmountA] = useState('');
   const [amountB, setAmountB] = useState('');
+  const [tokenAIndex, setTokenAIndex] = useState(0);
+  const [tokenBIndex, setTokenBIndex] = useState(1);
+
+  const tokenA = TOKENS[tokenAIndex];
+  const tokenB = TOKENS[tokenBIndex];
 
   // 查询两个代币的授权额度
   const { data: allowances, refetch: refetchAllowances } = useReadContracts({
     contracts: [
       {
-        address: CONTRACTS.TOKEN_A,
+        address: tokenA?.address,
         abi: ERC20_ABI,
         functionName: 'allowance',
         args: [address!, CONTRACTS.ROUTER],
       },
       {
-        address: CONTRACTS.TOKEN_B,
+        address: tokenB?.address,
         abi: ERC20_ABI,
         functionName: 'allowance',
         args: [address!, CONTRACTS.ROUTER],
       },
     ],
-    query: { enabled: !!address },
+    query: { enabled: !!address && !!tokenA && !!tokenB },
   });
 
   const { writeContract, data: hash, isPending } = useWriteContract();
@@ -41,7 +47,7 @@ export function AddLiquidity() {
 
   const handleApproveA = () => {
     writeContract({
-      address: CONTRACTS.TOKEN_A,
+      address: tokenA.address,
       abi: ERC20_ABI,
       functionName: 'approve',
       args: [CONTRACTS.ROUTER, parseUnits('1000000', 18)],
@@ -50,7 +56,7 @@ export function AddLiquidity() {
 
   const handleApproveB = () => {
     writeContract({
-      address: CONTRACTS.TOKEN_B,
+      address: tokenB.address,
       abi: ERC20_ABI,
       functionName: 'approve',
       args: [CONTRACTS.ROUTER, parseUnits('1000000', 18)],
@@ -67,8 +73,8 @@ export function AddLiquidity() {
       abi: ROUTER_ABI,
       functionName: 'addLiquidity',
       args: [
-        CONTRACTS.TOKEN_A,
-        CONTRACTS.TOKEN_B,
+        tokenA.address,
+        tokenB.address,
         amountAWei,
         amountBWei,
         BigInt(0), // amountAMin
@@ -85,22 +91,40 @@ export function AddLiquidity() {
 
       <div className="liquidity-container">
         <div className="input-group">
-          <label>Token A (TKA)</label>
-          <input
-            type="number"
-            value={amountA}
-            onChange={(e) => setAmountA(e.target.value)}
-            placeholder="0.0"
-            min="0"
-            step="0.1"
-          />
+          <label>Token A</label>
+          <div className="input-row">
+            <input
+              type="number"
+              value={amountA}
+              onChange={(e) => setAmountA(e.target.value)}
+              placeholder="0.0"
+              min="0"
+              step="0.1"
+            />
+            <select
+              value={tokenAIndex}
+              onChange={(e) => {
+                const newIndex = Number(e.target.value);
+                if (newIndex === tokenBIndex) {
+                  setTokenBIndex(tokenAIndex);
+                }
+                setTokenAIndex(newIndex);
+              }}
+            >
+              {TOKENS.map((token, idx) => (
+                <option key={token.address} value={idx}>
+                  {token.symbol}
+                </option>
+              ))}
+            </select>
+          </div>
           {needsApprovalA && amountA && (
             <button
               onClick={handleApproveA}
               disabled={isPending || isConfirming}
               className="btn btn-secondary btn-sm"
             >
-              授权 TKA
+              授权 {tokenA.symbol}
             </button>
           )}
         </div>
@@ -108,22 +132,40 @@ export function AddLiquidity() {
         <div className="plus-sign">+</div>
 
         <div className="input-group">
-          <label>Token B (TKB)</label>
-          <input
-            type="number"
-            value={amountB}
-            onChange={(e) => setAmountB(e.target.value)}
-            placeholder="0.0"
-            min="0"
-            step="0.1"
-          />
+          <label>Token B</label>
+          <div className="input-row">
+            <input
+              type="number"
+              value={amountB}
+              onChange={(e) => setAmountB(e.target.value)}
+              placeholder="0.0"
+              min="0"
+              step="0.1"
+            />
+            <select
+              value={tokenBIndex}
+              onChange={(e) => {
+                const newIndex = Number(e.target.value);
+                if (newIndex === tokenAIndex) {
+                  setTokenAIndex(tokenBIndex);
+                }
+                setTokenBIndex(newIndex);
+              }}
+            >
+              {TOKENS.map((token, idx) => (
+                <option key={token.address} value={idx}>
+                  {token.symbol}
+                </option>
+              ))}
+            </select>
+          </div>
           {needsApprovalB && amountB && (
             <button
               onClick={handleApproveB}
               disabled={isPending || isConfirming}
               className="btn btn-secondary btn-sm"
             >
-              授权 TKB
+              授权 {tokenB.symbol}
             </button>
           )}
         </div>

@@ -11,7 +11,9 @@ export function MultiHopSwap() {
   const [tokenInIndex, setTokenInIndex] = useState(0);
   const [tokenOutIndex, setTokenOutIndex] = useState(1);
   const [selectedPathIndex, setSelectedPathIndex] = useState(0);
-  const [slippage] = useState(0.5);
+  const [slippage, setSlippage] = useState(0.5);
+  const [deadlineMinutes, setDeadlineMinutes] = useState(30);
+  const [showSettings, setShowSettings] = useState(false);
 
   const tokenIn = TOKENS[tokenInIndex];
   const tokenOut = TOKENS[tokenOutIndex];
@@ -62,7 +64,7 @@ export function MultiHopSwap() {
     if (!amountIn || !address || !selectedPath) return;
 
     const minOut = (selectedPath.amountOut * BigInt(Math.floor((100 - slippage) * 100))) / BigInt(10000);
-    const deadline = BigInt(Math.floor(Date.now() / 1000) + 1800);
+    const deadline = BigInt(Math.floor(Date.now() / 1000) + deadlineMinutes * 60);
 
     writeContract({
       address: CONTRACTS.ROUTER,
@@ -78,7 +80,59 @@ export function MultiHopSwap() {
 
   return (
     <div className="card">
-      <h3>🔄 多跳 Swap</h3>
+      <div className="card-header">
+        <h3>🔄 Swap</h3>
+        <button 
+          className="settings-btn" 
+          onClick={() => setShowSettings(!showSettings)}
+          title="设置"
+        >
+          ⚙️
+        </button>
+      </div>
+
+      {showSettings && (
+        <div className="settings-panel">
+          <div className="settings-item">
+            <label>滑点容忍度</label>
+            <div className="slippage-options">
+              {[0.1, 0.5, 1.0].map((val) => (
+                <button
+                  key={val}
+                  className={`slippage-btn ${slippage === val ? 'active' : ''}`}
+                  onClick={() => setSlippage(val)}
+                >
+                  {val}%
+                </button>
+              ))}
+              <div className="slippage-custom">
+                <input
+                  type="number"
+                  value={slippage}
+                  onChange={(e) => setSlippage(Number(e.target.value))}
+                  min="0.1"
+                  max="50"
+                  step="0.1"
+                />
+                <span>%</span>
+              </div>
+            </div>
+          </div>
+          <div className="settings-item">
+            <label>交易截止时间</label>
+            <div className="deadline-input">
+              <input
+                type="number"
+                value={deadlineMinutes}
+                onChange={(e) => setDeadlineMinutes(Number(e.target.value))}
+                min="1"
+                max="180"
+              />
+              <span>分钟</span>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="swap-container">
         {/* 输入代币选择 */}
@@ -179,7 +233,7 @@ export function MultiHopSwap() {
         )}
 
         <div className="swap-info">
-          <p>滑点容忍度: {slippage}%</p>
+          <p>滑点: {slippage}% | 截止: {deadlineMinutes}分钟</p>
           {selectedPath && (
             <p>路径: {formatPath(selectedPath.path)} ({selectedPath.path.length - 1} 跳)</p>
           )}

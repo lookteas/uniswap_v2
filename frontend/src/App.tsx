@@ -2,13 +2,12 @@ import { useState } from 'react'
 import { useAccount } from 'wagmi'
 import { ConnectWallet } from './components/ConnectWallet'
 import { TokenBalance } from './components/TokenBalance'
-import { Swap } from './components/Swap'
 import { MultiHopSwap } from './components/MultiHopSwap'
 import { AddLiquidity } from './components/AddLiquidity'
 import { RemoveLiquidity } from './components/RemoveLiquidity'
 import './App.css'
 
-type Tab = 'swap' | 'multihop' | 'add' | 'remove'
+type Tab = 'swap' | 'add' | 'remove' | 'balance'
 
 function App() {
   const [activeTab, setActiveTab] = useState<Tab>('swap')
@@ -23,20 +22,12 @@ function App() {
       </header>
 
       <main className="main">
-        {isConnected && <TokenBalance />}
-
         <div className="tabs">
           <button
             className={`tab ${activeTab === 'swap' ? 'active' : ''}`}
             onClick={() => setActiveTab('swap')}
           >
             🔄 Swap
-          </button>
-          <button
-            className={`tab ${activeTab === 'multihop' ? 'active' : ''}`}
-            onClick={() => setActiveTab('multihop')}
-          >
-            🔀 多跳
           </button>
           <button
             className={`tab ${activeTab === 'add' ? 'active' : ''}`}
@@ -50,14 +41,20 @@ function App() {
           >
             ➖ 移除
           </button>
+          <button
+            className={`tab ${activeTab === 'balance' ? 'active' : ''}`}
+            onClick={() => setActiveTab('balance')}
+          >
+            💰 余额
+          </button>
         </div>
 
         {isConnected ? (
           <div className="tab-content">
-            {activeTab === 'swap' && <Swap />}
-            {activeTab === 'multihop' && <MultiHopSwap />}
+            {activeTab === 'swap' && <MultiHopSwap />}
             {activeTab === 'add' && <AddLiquidity />}
             {activeTab === 'remove' && <RemoveLiquidity />}
+            {activeTab === 'balance' && <TokenBalance />}
           </div>
         ) : (
           <div className="card connect-prompt">
