@@ -458,7 +458,7 @@ UI 显示 "✅ 交易成功!"
 
 - 详细的前后端交互流程图
 
-![](D:\code\web3\uniswap\uniswap_v2\images\multi_hop_swap_flow.svg)
+![](../images/multi_hop_swap_flow.svg)
 
 ---
 
