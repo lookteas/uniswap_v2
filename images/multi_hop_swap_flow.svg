@@ -1,0 +1,457 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 1100">
+  <defs>
+    <!-- 渐变定义 -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0c7588"/>
+      <stop offset="50%" style="stop-color:#0d1528"/>
+      <stop offset="100%" style="stop-color:#0c7580"/>
+    </linearGradient>
+    
+    <linearGradient id="frontendGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a3a5c"/>
+      <stop offset="100%" style="stop-color:#0d2240"/>
+    </linearGradient>
+    
+    <linearGradient id="contractGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0d1a4a"/>
+      <stop offset="100%" style="stop-color:#0d1528"/>
+    </linearGradient>
+    
+    <linearGradient id="pathBoxGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1e3a5f"/>
+      <stop offset="100%" style="stop-color:#0f2540"/>
+    </linearGradient>
+    
+    <linearGradient id="hookGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00d4aa"/>
+      <stop offset="100%" style="stop-color:#00a080"/>
+    </linearGradient>
+    
+    <linearGradient id="componentGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ff6b9d"/>
+      <stop offset="100%" style="stop-color:#c44569"/>
+    </linearGradient>
+    
+    <linearGradient id="routerGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#9945ff"/>
+      <stop offset="100%" style="stop-color:#6a2cc0"/>
+    </linearGradient>
+    
+    <linearGradient id="pairGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f7931a"/>
+      <stop offset="100%" style="stop-color:#c77a15"/>
+    </linearGradient>
+    
+    <linearGradient id="arrowGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#00d4aa"/>
+      <stop offset="100%" style="stop-color:#00ffcc"/>
+    </linearGradient>
+    
+    <linearGradient id="dataFlowGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#ff6b9d"/>
+      <stop offset="100%" style="stop-color:#ffaa00"/>
+    </linearGradient>
+    
+    <!-- 发光效果 -->
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    
+    <filter id="strongGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="6" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    
+    <!-- 箭头标记 -->
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#e18a08ff"/>
+    </marker>
+    
+    <marker id="arrowheadPink" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#de962aff"/>
+    </marker>
+    
+    <marker id="arrowheadOrange" markerWidth="30" markerHeight="7" refX="3" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#f7931a"/>
+    </marker>
+  </defs>
+  
+  <!-- 背景 -->
+  <rect width="1400" height="1100" fill="url(#bgGrad)"/>
+  
+  <!-- 网格背景 -->
+  <g opacity="0.1">
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#00d4aa" stroke-width="2.5"/>
+    </pattern>
+    <rect width="1400" height="1100" fill="url(#grid)"/>
+  </g>
+  
+  <!-- 标题 -->
+  <text x="700" y="50" text-anchor="middle" fill="#ffffffff" font-family="Consolas, monospace" font-size="28" font-weight="bold" filter="url(#strongGlow)">
+    Uniswap V2 前后端交互多跳 SWAP 流程
+  </text>
+  <text x="700" y="80" text-anchor="middle" fill="#cecdcdff" font-family="Consolas, monospace" font-size="14">
+    前端路径查询 → 链上合约执行
+  </text>
+  
+  <!-- ==================== 前端区域 ==================== -->
+  <rect x="30" y="100" width="660" height="950" rx="15" fill="url(#frontendGrad)" stroke="#00d4aa" stroke-width="2" opacity="0.9"/>
+  <text x="360" y="135" text-anchor="middle" fill="#00ffcc" font-family="Consolas, monospace" font-size="20" font-weight="bold">
+    📱 FRONTEND (链下实现)
+  </text>
+  
+  <!-- ==================== 合约区域 ==================== -->
+  <rect x="710" y="100" width="660" height="950" rx="15" fill="url(#contractGrad)" stroke="#9945ff" stroke-width="2" opacity="0.9"/>
+  <text x="1040" y="135" text-anchor="middle" fill="#bf7fff" font-family="Consolas, monospace" font-size="20" font-weight="bold">
+    ⛓️ SMART CONTRACT (链上实现)
+  </text>
+  
+  <!-- ==================== Step 1: usePathFinder Hook ==================== -->
+  <g>
+    <rect x="60" y="170" width="600" height="280" rx="10" fill="url(#pathBoxGrad)" stroke="#00d4aa" stroke-width="1.5"/>
+    <text x="80" y="200" fill="#00ffcc" font-family="Consolas, monospace" font-size="16" font-weight="bold">
+      STEP 1: usePathFinder Hook
+    </text>
+    <text x="80" y="225" fill="#ffffffff" font-family="Consolas, monospace" font-size="11">
+      src/hooks/usePathFinder.ts
+    </text>
+    
+    <!-- 1.1 生成路径 -->
+    <rect x="80" y="240" width="260" height="90" rx="8" fill="#0a1525" stroke="#00d4aa" stroke-width="1"/>
+    <text x="100" y="265" fill="#00ffcc" font-family="Consolas, monospace" font-size="12" font-weight="bold">
+      1.1 generatePaths()
+    </text>
+    <text x="100" y="285" fill="#aaa" font-family="Consolas, monospace" font-size="10">
+      枚举所有可能路径:
+    </text>
+    <text x="100" y="302" fill="#fff" font-family="Consolas, monospace" font-size="10">
+      • [TKA → TKB] (1跳)
+    </text>
+    <text x="100" y="317" fill="#fff" font-family="Consolas, monospace" font-size="10">
+      • [TKA → TKC → TKB] (2跳)
+    </text>
+    
+    <!-- 1.2 批量查询 -->
+    <rect x="360" y="240" width="280" height="90" rx="8" fill="#0a1525" stroke="#00d4aa" stroke-width="1"/>
+    <text x="380" y="265" fill="#00ffcc" font-family="Consolas, monospace" font-size="12" font-weight="bold">
+      1.2 useReadContracts()
+    </text>
+    <text x="380" y="285" fill="#aaa" font-family="Consolas, monospace" font-size="10">
+      批量调用 getAmountsOut:
+    </text>
+    <text x="380" y="302" fill="#fff" font-family="Consolas, monospace" font-size="10">
+      路径1 → 0.98 TKB
+    </text>
+    <text x="380" y="317" fill="#fff" font-family="Consolas, monospace" font-size="10">
+      路径2 → 0.99 TKB ✓ 最优
+    </text>
+    
+    <!-- 箭头 1.1 → 1.2 -->
+    <line x1="340" y1="285" x2="355" y2="285" stroke="#00ffcc" stroke-width="2" marker-end="url(#arrowhead)"/>
+    
+    <!-- 1.3 排序返回 -->
+    <rect x="80" y="345" width="560" height="90" rx="8" fill="#0a1525" stroke="#00d4aa" stroke-width="1"/>
+    <text x="100" y="370" fill="#00ffcc" font-family="Consolas, monospace" font-size="12" font-weight="bold">
+      1.3 Sort &amp; Return bestPath
+    </text>
+    <text x="100" y="395" fill="#aaa" font-family="Consolas, monospace" font-size="10">
+      返回数据结构:
+    </text>
+    <text x="100" y="415" fill="#ffaa00" font-family="Consolas, monospace" font-size="11">
+      { path: [TKA, TKC, TKB], addresses: ['0x3aBe...', '0x...TKC', '0x64e6...'], amountOut: 990000... }
+    </text>
+    
+    <!-- 箭头 1.2 → 1.3 -->
+    <path d="M 500 330 L 500 340" stroke="#00ffcc" stroke-width="2" marker-end="url(#arrowhead)"/>
+  </g>
+  
+  <!-- ==================== Step 2: MultiHopSwap Component ==================== -->
+  <g>
+    <rect x="60" y="470" width="600" height="200" rx="10" fill="url(#pathBoxGrad)" stroke="#ff6b9d" stroke-width="1.5"/>
+    <text x="80" y="500" fill="#ff6b9d" font-family="Consolas, monospace" font-size="16" font-weight="bold">
+      STEP 2: MultiHopSwap Component
+    </text>
+    <text x="80" y="525" fill="#ffffffff" font-family="Consolas, monospace" font-size="11">
+      src/components/MultiHopSwap.tsx
+    </text>
+    
+    <!-- 获取路径 -->
+    <rect x="80" y="540" width="260" height="60" rx="8" fill="#0a1525" stroke="#ff6b9d" stroke-width="1"/>
+    <text x="100" y="565" fill="#ff6b9d" font-family="Consolas, monospace" font-size="12" font-weight="bold">
+      2.1 获取最优路径
+    </text>
+    <text x="100" y="585" fill="#fff" font-family="Consolas, monospace" font-size="10">
+      const { bestPath } = usePathFinder()
+    </text>
+    
+    <!-- 用户选择 -->
+    <rect x="360" y="540" width="280" height="60" rx="8" fill="#0a1525" stroke="#ff6b9d" stroke-width="1"/>
+    <text x="380" y="565" fill="#ff6b9d" font-family="Consolas, monospace" font-size="12" font-weight="bold">
+      2.2 用户选择路径
+    </text>
+    <text x="380" y="585" fill="#fff" font-family="Consolas, monospace" font-size="10">
+      selectedPath = paths[index]
+    </text>
+    
+    <!-- 箭头 -->
+    <line x1="340" y1="570" x2="355" y2="570" stroke="#ff6b9d" stroke-width="2" marker-end="url(#arrowheadPink)"/>
+    
+    <!-- 点击 Swap -->
+    <rect x="80" y="615" width="560" height="45" rx="8" fill="url(#componentGrad)" stroke="#ff6b9d" stroke-width="1"/>
+    <text x="360" y="643" text-anchor="middle" fill="#fff" font-family="Consolas, monospace" font-size="14" font-weight="bold">
+      🖱️ 用户点击 SWAP 按钮
+    </text>
+  </g>
+  
+  <!-- ==================== Step 3: handleSwap ==================== -->
+  <g>
+    <rect x="60" y="690" width="600" height="180" rx="10" fill="url(#pathBoxGrad)" stroke="#ffaa00" stroke-width="1.5"/>
+    <text x="80" y="720" fill="#ffaa00" font-family="Consolas, monospace" font-size="16" font-weight="bold">
+      STEP 3: handleSwap() 构建交易, 在用户点击 Swap 按钮 时被调用
+    </text>
+
+    
+    <!-- 参数构建 -->
+    <rect x="80" y="740" width="560" height="115" rx="8" fill="#0a1525" stroke="#ffaa00" stroke-width="1"/>
+    <text x="100" y="765" fill="#ffaa00" font-family="Consolas, monospace" font-size="12" font-weight="bold">
+      writeContract() 参数:
+    </text>
+    <text x="100" y="790" fill="#fff" font-family="Consolas, monospace" font-size="11">
+      functionName: 'swapExactTokensForTokens'
+    </text>
+    <text x="100" y="810" fill="#fff" font-family="Consolas, monospace" font-size="11">
+      args: [amountIn, minOut, <tspan fill="#00ffcc">selectedPath.addresses</tspan>, to, deadline]
+    </text>
+    <text x="100" y="835" fill="#ffffffff" font-family="Consolas, monospace" font-size="10">
+                                    ↑ ['0x3aBe...TKA', '0x...TKC', '0x64e6...TKB']
+    </text>
+  </g>
+  
+  <!-- ==================== 发送交易箭头 ==================== -->
+  <g filter="url(#strongGlow)">
+    <path d="M 660 800 Q 685 800 685 650 Q 685 560 722 560" 
+          stroke="url(#dataFlowGrad)" stroke-width="2.5" fill="none" 
+          stroke-dasharray="10,5" marker-end="url(#arrowheadOrange)">
+      <animate attributeName="stroke-dashoffset" from="0" to="-30" dur="1s" repeatCount="indefinite"/>
+    </path>
+    <text x="600" y="630" fill="#ffffffff" font-family="Consolas, monospace" font-size="15" font-weight="bold" transform="rotate(-90, 685, 640)">
+      发送交易 TX
+    </text>
+  </g>
+  
+  <!-- ==================== Step 4: Router Contract ==================== -->
+  <g>
+    <rect x="740" y="170" width="600" height="300" rx="10" fill="#1a0d30" stroke="#9945ff" stroke-width="1.5"/>
+    <text x="760" y="200" fill="#bf7fff" font-family="Consolas, monospace" font-size="16" font-weight="bold">
+      STEP 4: UniswapV2Router02
+    </text>
+    <text x="760" y="225" fill="#ffffffff" font-family="Consolas, monospace" font-size="11">
+      0x3c66Fe68778281be4358F21BfB63aE9cD242aB58
+    </text>
+    
+    <!-- swapExactTokensForTokens -->
+    <rect x="760" y="240" width="560" height="210" rx="8" fill="#0d0520" stroke="#9945ff" stroke-width="1"/>
+    <text x="780" y="270" fill="#bf7fff" font-family="Consolas, monospace" font-size="13" font-weight="bold">
+      swapExactTokensForTokens(path)
+    </text>
+    
+    <!-- 4.1 验证 -->
+    <rect x="780" y="285" width="250" height="50" rx="6" fill="#150a25" stroke="#9945ff" stroke-width="0.5"/>
+    <text x="800" y="308" fill="#9945ff" font-family="Consolas, monospace" font-size="11">
+      4.1 ensure(deadline)
+    </text>
+    <text x="800" y="325" fill="#ffffffff" font-family="Consolas, monospace" font-size="10">
+      验证交易未过期
+    </text>
+    
+    <!-- 4.2 计算 -->
+    <rect x="1050" y="285" width="250" height="50" rx="6" fill="#150a25" stroke="#9945ff" stroke-width="0.5"/>
+    <text x="1070" y="308" fill="#9945ff" font-family="Consolas, monospace" font-size="11">
+      4.2 getAmountsOut()
+    </text>
+    <text x="1070" y="325" fill="#ffffffff" font-family="Consolas, monospace" font-size="10">
+      计算每跳输出金额
+    </text>
+    
+    <!-- 箭头 -->
+    <line x1="1030" y1="310" x2="1045" y2="310" stroke="#9945ff" stroke-width="2"/>
+    
+    <!-- 4.3 验证输出 -->
+    <rect x="780" y="350" width="250" height="50" rx="6" fill="#150a25" stroke="#9945ff" stroke-width="0.5"/>
+    <text x="800" y="373" fill="#9945ff" font-family="Consolas, monospace" font-size="11">
+      4.3 require(output >= min)
+    </text>
+    <text x="800" y="390" fill="#ffffffff" font-family="Consolas, monospace" font-size="10">
+      滑点保护检查
+    </text>
+    
+    <!-- 4.4 转移代币 -->
+    <rect x="1050" y="350" width="250" height="50" rx="6" fill="#150a25" stroke="#9945ff" stroke-width="0.5"/>
+    <text x="1070" y="373" fill="#9945ff" font-family="Consolas, monospace" font-size="11">
+      4.4 transferFrom()
+    </text>
+    <text x="1070" y="390" fill="#ffffffff" font-family="Consolas, monospace" font-size="10">
+      转移输入代币到Pair
+    </text>
+    
+    <!-- 4.5 执行 swap -->
+    <rect x="780" y="415" width="520" height="25" rx="6" fill="url(#routerGrad)" stroke="#9945ff" stroke-width="0.5"/>
+    <text x="1040" y="433" text-anchor="middle" fill="#fff" font-family="Consolas, monospace" font-size="12" font-weight="bold">
+      4.5 _swap(amounts, path, to) → 调用 Pair 合约
+    </text>
+  </g>
+  
+  <!-- ==================== Step 5: Pair Contracts (多跳执行) ==================== -->
+  <g>
+    <rect x="740" y="490" width="600" height="380" rx="10" fill="#1a0d30" stroke="#f7931a" stroke-width="1.5"/>
+    <text x="760" y="520" fill="#f7931a" font-family="Consolas, monospace" font-size="16" font-weight="bold">
+      STEP 5: _swap() 多跳执行
+    </text>
+    <text x="760" y="545" fill="#ffffffff" font-family="Consolas, monospace" font-size="11">
+      循环遍历 path 数组，逐跳执行
+    </text>
+    
+    <!-- 跳 1: TKA → TKC -->
+    <g>
+      <rect x="760" y="560" width="270" height="140" rx="8" fill="#0d0520" stroke="#f7931a" stroke-width="1"/>
+      <text x="895" y="585" text-anchor="middle" fill="#f7931a" font-family="Consolas, monospace" font-size="13" font-weight="bold">
+        🔄 HOP 1
+      </text>
+      
+      <!-- Pair 合约 -->
+      <rect x="780" y="600" width="230" height="85" rx="6" fill="url(#pairGrad)" opacity="0.3" stroke="#f7931a" stroke-width="0.5"/>
+      <text x="895" y="625" text-anchor="middle" fill="#fff" font-family="Consolas, monospace" font-size="12" font-weight="bold">
+        Pair(TKA/TKC)
+      </text>
+      <text x="895" y="645" text-anchor="middle" fill="#aaa" font-family="Consolas, monospace" font-size="10">
+        swap(amount0Out, amount1Out)
+      </text>
+      <text x="895" y="670" text-anchor="middle" fill="#00ffcc" font-family="Consolas, monospace" font-size="11">
+        TKA → TKC
+      </text>
+    </g>
+    
+    <!-- 箭头 跳1 → 跳2 -->
+    <g filter="url(#glow)">
+      <line x1="1030" y1="630" x2="1050" y2="630" stroke="#f7931a" stroke-width="3" marker-end="url(#arrowheadOrange)"/>
+    </g>
+    
+    <!-- 跳 2: TKC → TKB -->
+    <g>
+      <rect x="1050" y="560" width="270" height="140" rx="8" fill="#0d0520" stroke="#f7931a" stroke-width="1"/>
+      <text x="1185" y="585" text-anchor="middle" fill="#f7931a" font-family="Consolas, monospace" font-size="13" font-weight="bold">
+        🔄 HOP 2
+      </text>
+      
+      <!-- Pair 合约 -->
+      <rect x="1070" y="600" width="230" height="85" rx="6" fill="url(#pairGrad)" opacity="0.3" stroke="#f7931a" stroke-width="0.5"/>
+      <text x="1185" y="625" text-anchor="middle" fill="#fff" font-family="Consolas, monospace" font-size="12" font-weight="bold">
+        Pair(TKC/TKB)
+      </text>
+      <text x="1185" y="645" text-anchor="middle" fill="#aaa" font-family="Consolas, monospace" font-size="10">
+        swap(amount0Out, amount1Out)
+      </text>
+      <text x="1185" y="670" text-anchor="middle" fill="#00ffcc" font-family="Consolas, monospace" font-size="11">
+        TKC → TKB
+      </text>
+    </g>
+    
+    <!-- 最终输出 -->
+    <rect x="760" y="720" width="560" height="60" rx="8" fill="#0a2010" stroke="#00ff88" stroke-width="2"/>
+    <text x="1040" y="750" text-anchor="middle" fill="#00ff88" font-family="Consolas, monospace" font-size="14" font-weight="bold" filter="url(#glow)">
+      ✅ 最终输出: 0.99 TKB → 用户钱包
+    </text>
+    <text x="1040" y="770" text-anchor="middle" fill="#888" font-family="Consolas, monospace" font-size="11">
+      to: 0xYourAddress
+    </text>
+    
+    <!-- 路径可视化 -->
+    <g>
+      <rect x="760" y="795" width="560" height="60" rx="8" fill="#0d0520" stroke="#666" stroke-width="1"/>
+      <text x="780" y="820" fill="#ffffffff" font-family="Consolas, monospace" font-size="11">
+        path[] 遍历:
+      </text>
+      
+      <!-- TKA -->
+      <rect x="880" y="808" width="60" height="30" rx="4" fill="#ff6b9d" opacity="0.8"/>
+      <text x="910" y="828" text-anchor="middle" fill="#fff" font-family="Consolas, monospace" font-size="11" font-weight="bold">TKA</text>
+      
+      <!-- 箭头 -->
+      <text x="955" y="828" fill="#00ffcc" font-family="Consolas, monospace" font-size="14">→</text>
+      
+      <!-- TKC -->
+      <rect x="980" y="808" width="60" height="30" rx="4" fill="#00d4aa" opacity="0.8"/>
+      <text x="1010" y="828" text-anchor="middle" fill="#fff" font-family="Consolas, monospace" font-size="11" font-weight="bold">TKC</text>
+      
+      <!-- 箭头 -->
+      <text x="1055" y="828" fill="#00ffcc" font-family="Consolas, monospace" font-size="14">→</text>
+      
+      <!-- TKB -->
+      <rect x="1080" y="808" width="60" height="30" rx="4" fill="#9945ff" opacity="0.8"/>
+      <text x="1110" y="828" text-anchor="middle" fill="#fff" font-family="Consolas, monospace" font-size="11" font-weight="bold">TKB</text>
+    </g>
+  </g>
+  
+  <!-- ==================== Step 6: 返回前端 ==================== -->
+  <g>
+    <rect x="60" y="890" width="600" height="140" rx="10" fill="url(#pathBoxGrad)" stroke="#00ff88" stroke-width="1.5"/>
+    <text x="80" y="920" fill="#00ff88" font-family="Consolas, monospace" font-size="16" font-weight="bold">
+      STEP 6: 交易确认
+    </text>
+    
+    <rect x="80" y="940" width="560" height="79" rx="8" fill="#0a2010" stroke="#00ff88" stroke-width="1"/>
+    <text x="100" y="965" fill="#00ff88" font-family="Consolas, monospace" font-size="12" font-weight="bold">
+      useWaitForTransactionReceipt({ hash })
+    </text>
+    <text x="100" y="990" fill="#fff" font-family="Consolas, monospace" font-size="11">
+      自动监听这个 hash，等待链上确认，确认后 isSuccess 变为 true，触发 UI 更新
+    </text>
+    <text x="100" y="1013" fill="#fff" font-family="Consolas, monospace" font-size="11">
+    ✅交易成功! 查看: https://sepolia.etherscan.io/tx/0x...
+    </text>
+  </g>
+  
+  <!-- 返回箭头 -->
+  <g filter="url(#glow)">
+    <path d="M 990 870 Q 900 990 660 990" 
+          stroke="#15ef11e2" stroke-width="3" fill="none" marker-end="url(#arrowhead)"/>
+  </g>
+  
+  <!-- ==================== 图例 ==================== -->
+  <g>
+    <rect x="60" y="1040" width="1280" height="45" rx="8" fill="#0a0a15" stroke="#333" stroke-width="1"/>
+    <text x="80" y="1068" fill="#666" font-family="Consolas, monospace" font-size="12">LEGEND:</text>
+    
+    <rect x="160" y="1055" width="15" height="15" fill="#00d4aa"/>
+    <text x="180" y="1068" fill="#aaa" font-family="Consolas, monospace" font-size="11">Hook/计算</text>
+    
+    <rect x="280" y="1055" width="15" height="15" fill="#ff6b9d"/>
+    <text x="300" y="1068" fill="#aaa" font-family="Consolas, monospace" font-size="11">组件/UI</text>
+    
+    <rect x="400" y="1055" width="15" height="15" fill="#ffaa00"/>
+    <text x="420" y="1068" fill="#aaa" font-family="Consolas, monospace" font-size="11">交易构建</text>
+    
+    <rect x="540" y="1055" width="15" height="15" fill="#9945ff"/>
+    <text x="560" y="1068" fill="#aaa" font-family="Consolas, monospace" font-size="11">Router合约</text>
+    
+    <rect x="680" y="1055" width="15" height="15" fill="#f7931a"/>
+    <text x="700" y="1068" fill="#aaa" font-family="Consolas, monospace" font-size="11">Pair合约</text>
+    
+    <rect x="820" y="1055" width="15" height="15" fill="#00ff88"/>
+    <text x="840" y="1068" fill="#aaa" font-family="Consolas, monospace" font-size="11">成功/完成</text>
+    
+    <line x1="960" y1="1062" x2="1000" y2="1062" stroke="#ffaa00" stroke-width="3" stroke-dasharray="5,3"/>
+    <text x="1010" y="1068" fill="#aaa" font-family="Consolas, monospace" font-size="11">链下→链上</text>
+    
+    <line x1="1130" y1="1062" x2="1170" y2="1062" stroke="#00ffcc" stroke-width="2"/>
+    <text x="1180" y="1068" fill="#aaa" font-family="Consolas, monospace" font-size="11">数据流</text>
+  </g>
+</svg>
