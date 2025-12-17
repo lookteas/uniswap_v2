@@ -1,29 +1,34 @@
-= Cross chain interoperability
+= Cross Chain Awareness
 
 [.readme-notice]
 NOTE: This document is better viewed at https://docs.openzeppelin.com/contracts/api/crosschain
 
-This directory contains contracts for sending and receiving cross chain messages that follows the ERC-7786 standard.
+This directory provides building blocks to improve cross-chain awareness of smart contracts.
 
-* {CrosschainLinked}: helper to facilitate communication between a contract on one chain and counterparts on remote chains through ERC-7786 gateways.
-* {ERC7786Recipient}: generic ERC-7786 crosschain contract that receives messages from a trusted gateway.
+- {CrossChainEnabled} is an abstraction that contains accessors and modifiers to control the execution flow when receiving cross-chain messages.
 
-Additionally there are multiple bridge constructions:
+== CrossChainEnabled specializations
 
-* {BridgeERC20Core}: Core bridging logic for crosschain ERC-20 transfer. Used by {BridgeERC20}, {BridgeERC7802} and {ERC20Crosschain},
-* {BridgeERC20}: Standalone bridge contract to connect an ERC-20 token contract with counterparts on remote chains,
-* {BridgeERC7802}: Standalone bridge contract to connect an ERC-7802 token contract with counterparts on remote chains.
+The following specializations of {CrossChainEnabled} provide implementations of the {CrossChainEnabled} abstraction for specific bridges. This can be used to complex cross-chain aware components such as {AccessControlCrossChain}.
 
-== Helpers
+{{CrossChainEnabledAMB}}
 
-{{CrosschainLinked}}
+{{CrossChainEnabledArbitrumL1}}
 
-{{ERC7786Recipient}}
+{{CrossChainEnabledArbitrumL2}}
 
-== Bridges
+{{CrossChainEnabledOptimism}}
 
-{{BridgeERC20Core}}
+{{CrossChainEnabledPolygonChild}}
 
-{{BridgeERC20}}
+== Libraries for cross-chain
 
-{{BridgeERC7802}}
+In addition to the {CrossChainEnabled} abstraction, cross-chain awareness is also available through libraries. These libraries can be used to build complex designs such as contracts with the ability to interact with multiple bridges.
+
+{{LibAMB}}
+
+{{LibArbitrumL1}}
+
+{{LibArbitrumL2}}
+
+{{LibOptimism}}

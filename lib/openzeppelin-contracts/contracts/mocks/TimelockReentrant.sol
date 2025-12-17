@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.20;
+pragma solidity ^0.8.0;
 
-import {Address} from "../utils/Address.sol";
+import "../utils/Address.sol";
 
 contract TimelockReentrant {
     address private _reenterTarget;
@@ -12,7 +12,7 @@ contract TimelockReentrant {
         _reentered = true;
     }
 
-    function enableReentrancy(address target, bytes calldata data) external {
+    function enableRentrancy(address target, bytes calldata data) external {
         _reenterTarget = target;
         _reenterData = data;
     }

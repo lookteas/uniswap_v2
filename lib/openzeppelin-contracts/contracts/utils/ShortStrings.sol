@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
-// OpenZeppelin Contracts (last updated v5.5.0) (utils/ShortStrings.sol)
+// OpenZeppelin Contracts (last updated v4.9.0) (utils/ShortStrings.sol)
 
-pragma solidity ^0.8.20;
+pragma solidity ^0.8.8;
 
-import {StorageSlot} from "./StorageSlot.sol";
+import "./StorageSlot.sol";
 
 // | string  | 0xAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA   |
 // | length  | 0x                                                              BB |
@@ -39,7 +39,7 @@ type ShortString is bytes32;
  */
 library ShortStrings {
     // Used as an identifier for strings longer than 31 bytes.
-    bytes32 private constant FALLBACK_SENTINEL = 0x00000000000000000000000000000000000000000000000000000000000000FF;
+    bytes32 private constant _FALLBACK_SENTINEL = 0x00000000000000000000000000000000000000000000000000000000000000FF;
 
     error StringTooLong(string str);
     error InvalidShortString();
@@ -51,7 +51,7 @@ library ShortStrings {
      */
     function toShortString(string memory str) internal pure returns (ShortString) {
         bytes memory bstr = bytes(str);
-        if (bstr.length > 0x1f) {
+        if (bstr.length > 31) {
             revert StringTooLong(str);
         }
         return ShortString.wrap(bytes32(uint256(bytes32(bstr)) | bstr.length));
@@ -63,8 +63,9 @@ library ShortStrings {
     function toString(ShortString sstr) internal pure returns (string memory) {
         uint256 len = byteLength(sstr);
         // using `new string(len)` would work locally but is not memory safe.
-        string memory str = new string(0x20);
-        assembly ("memory-safe") {
+        string memory str = new string(32);
+        /// @solidity memory-safe-assembly
+        assembly {
             mstore(str, len)
             mstore(add(str, 0x20), sstr)
         }
@@ -76,7 +77,7 @@ library ShortStrings {
      */
     function byteLength(ShortString sstr) internal pure returns (uint256) {
         uint256 result = uint256(ShortString.unwrap(sstr)) & 0xFF;
-        if (result > 0x1f) {
+        if (result > 31) {
             revert InvalidShortString();
         }
         return result;
@@ -86,19 +87,19 @@ library ShortStrings {
      * @dev Encode a string into a `ShortString`, or write it to storage if it is too long.
      */
     function toShortStringWithFallback(string memory value, string storage store) internal returns (ShortString) {
-        if (bytes(value).length < 0x20) {
+        if (bytes(value).length < 32) {
             return toShortString(value);
         } else {
             StorageSlot.getStringSlot(store).value = value;
-            return ShortString.wrap(FALLBACK_SENTINEL);
+            return ShortString.wrap(_FALLBACK_SENTINEL);
         }
     }
 
     /**
-     * @dev Decode a string that was encoded to `ShortString` or written to storage using {toShortStringWithFallback}.
+     * @dev Decode a string that was encoded to `ShortString` or written to storage using {setWithFallback}.
      */
     function toStringWithFallback(ShortString value, string storage store) internal pure returns (string memory) {
-        if (ShortString.unwrap(value) != FALLBACK_SENTINEL) {
+        if (ShortString.unwrap(value) != _FALLBACK_SENTINEL) {
             return toString(value);
         } else {
             return store;
@@ -106,14 +107,13 @@ library ShortStrings {
     }
 
     /**
-     * @dev Return the length of a string that was encoded to `ShortString` or written to storage using
-     * {toShortStringWithFallback}.
+     * @dev Return the length of a string that was encoded to `ShortString` or written to storage using {setWithFallback}.
      *
      * WARNING: This will return the "byte length" of the string. This may not reflect the actual length in terms of
      * actual characters as the UTF-8 encoding of a single character can span over multiple bytes.
      */
     function byteLengthWithFallback(ShortString value, string storage store) internal view returns (uint256) {
-        if (ShortString.unwrap(value) != FALLBACK_SENTINEL) {
+        if (ShortString.unwrap(value) != _FALLBACK_SENTINEL) {
             return byteLength(value);
         } else {
             return bytes(store).length;

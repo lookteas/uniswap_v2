@@ -1,14 +1,14 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.20;
+pragma solidity ^0.8.9;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
-import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Permit.sol";
+import "@openzeppelin/contracts/token/ERC20/extensions/draft-ERC20Permit.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 /**
  * @title TestToken
- * @dev 生产级 ERC20 代币实现，基于 OpenZeppelin 标准库
+ * @dev 生产级 ERC20 代币实现，基于 OpenZeppelin 4.9.6 标准库
  * 
  * 功能特性:
  * - ERC20 标准实现
@@ -42,7 +42,7 @@ contract TestToken is ERC20, ERC20Burnable, ERC20Permit, Ownable {
         string memory symbol_,
         uint256 initialSupply_,
         uint256 maxSupply_
-    ) ERC20(name_, symbol_) ERC20Permit(name_) Ownable(msg.sender) {
+    ) ERC20(name_, symbol_) ERC20Permit(name_) {
         require(maxSupply_ == 0 || initialSupply_ <= maxSupply_, "Initial supply exceeds max supply");
         maxSupply = maxSupply_;
         
