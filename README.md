@@ -23,11 +23,17 @@
 │       ├── components/
 │       │   ├── AddLiquidity.tsx         # 添加流动性 (ERC-2612 Permit)
 │       │   ├── AddLiquidityPermit2.tsx  # 添加流动性 (Permit2)
-│       │   ├── MultiHopSwap.tsx         # 多跳兑换
-│       │   └── RemoveLiquidity.tsx      # 移除流动性
+│       │   ├── MultiHopSwap.tsx         # 多跳兑换 (传统模式)
+│       │   ├── SwapPermit2.tsx          # 多跳兑换 (Permit2)
+│       │   ├── RemoveLiquidity.tsx      # 移除流动性
+│       │   ├── RemoveLiquidityPermit2.tsx # 移除流动性 (Permit2)
+│       │   ├── TokenBalance.tsx         # 代币余额/LP/池子储备
+│       │   └── ConnectWallet.tsx        # 钱包连接 + 水龙头 + WETH
+│       ├── hooks/
+│       │   └── usePathFinder.ts         # 多跳路径查找 (支持4跳)
 │       └── config/
 │           ├── contracts.ts   # 合约地址和 ABI
-│           └── tokens.ts      # 代币配置
+│           └── tokens.ts      # 代币配置 (含 WETH)
 ├── docs/
 │   ├── DEBUG_ADDLIQUIDITY.md  # 调试记录
 │   └── PERMIT2.md             # Permit2 集成文档
@@ -113,16 +119,24 @@ forge script script/DeployUniswapV2.s.sol:DeployUniswapV2 \
 | Factory | `0x9A267db279FE7d11138f9293784460Df577c3198` |
 | Router | `0x3c66Fe68778281be4358F21BfB63aE9cD242aB58` |
 | WETH | `0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9` |
-| Permit2Router | `0xDC6481b5b572654E16213781f2f6106D65860a01` |
+| Permit2Router | `0x23F77d19fA26514C8053958ca8cD95FF73D22372` |
 
 ### 测试代币
 
 | 代币 | 地址 |
 |------|------|
+| WETH | `0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9` |
 | TKA | `0x89349c29eAb08674Ccb243aEf113c28847fB5215` |
 | TKB | `0x92e90F895172CDc96BB0985BC56f0cA4874aEd79` |
 | TKC | `0x7Ca1a37CD0dE6f2bf06c09Da57bEa14344BfBa25` |
 | TKD | `0x4dDCabc42aAF3403e300413F3b8AD909F58785b1` |
+| TKE | `0xC479b9504E6B70e7cfD8C6479d83D9b5b0883c6` |
+
+### 辅助合约
+
+| 合约 | 地址 |
+|------|------|
+| Faucet | `0xf641f31d368B61F366672EB88F3a033ACC5DD27d` |
 
 **Init Code Hash**: `0x25aad938d8616b6e59148d3e701e4966de4418a752233589352d7c616a256568`
 
@@ -132,6 +146,7 @@ forge script script/DeployUniswapV2.s.sol:DeployUniswapV2 \
 
 - [DEPLOYMENT.md](./DEPLOYMENT.md) - 完整的部署和测试指南
 - [docs/PERMIT2.md](./docs/PERMIT2.md) - Permit2 集成文档
+- [docs/FRONTEND_FEATURES.md](./docs/FRONTEND_FEATURES.md) - 前端功能文档
 - [docs/DEBUG_ADDLIQUIDITY.md](./docs/DEBUG_ADDLIQUIDITY.md) - 调试记录
 
 ## Foundry 命令参考

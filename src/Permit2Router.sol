@@ -16,6 +16,12 @@ interface IPermit2 {
         uint256 deadline;
     }
 
+    struct PermitBatchTransferFrom {
+        TokenPermissions[] permitted;
+        uint256 nonce;
+        uint256 deadline;
+    }
+
     struct SignatureTransferDetails {
         address to;
         uint256 requestedAmount;
@@ -24,6 +30,13 @@ interface IPermit2 {
     function permitTransferFrom(
         PermitTransferFrom calldata permit,
         SignatureTransferDetails calldata transferDetails,
+        address owner,
+        bytes calldata signature
+    ) external;
+
+    function permitTransferFrom(
+        PermitBatchTransferFrom calldata permit,
+        SignatureTransferDetails[] calldata transferDetails,
         address owner,
         bytes calldata signature
     ) external;
@@ -100,6 +113,11 @@ contract Permit2Router {
         bytes signatureB;
     }
 
+    struct Permit2BatchParams {
+        uint256 nonce;
+        bytes signature;
+    }
+
     function addLiquidityWithPermit2(
         AddLiquidityParams calldata params,
         Permit2Params calldata permit2
@@ -125,6 +143,43 @@ contract Permit2Router {
         );
 
         // 退还多余的代币
+        _refundRemaining(params.tokenA);
+        _refundRemaining(params.tokenB);
+    }
+
+    function addLiquidityWithPermit2Batch(
+        AddLiquidityParams calldata params,
+        Permit2BatchParams calldata permit2
+    ) external returns (uint256 amountAActual, uint256 amountBActual, uint256 liquidity) {
+        IPermit2.TokenPermissions[] memory permitted = new IPermit2.TokenPermissions[](2);
+        permitted[0] = IPermit2.TokenPermissions({ token: params.tokenA, amount: params.amountA });
+        permitted[1] = IPermit2.TokenPermissions({ token: params.tokenB, amount: params.amountB });
+
+        IPermit2.SignatureTransferDetails[] memory details = new IPermit2.SignatureTransferDetails[](2);
+        details[0] = IPermit2.SignatureTransferDetails({ to: address(this), requestedAmount: params.amountA });
+        details[1] = IPermit2.SignatureTransferDetails({ to: address(this), requestedAmount: params.amountB });
+
+        IPermit2(PERMIT2).permitTransferFrom(
+            IPermit2.PermitBatchTransferFrom({ permitted: permitted, nonce: permit2.nonce, deadline: params.deadline }),
+            details,
+            msg.sender,
+            permit2.signature
+        );
+
+        IERC20(params.tokenA).approve(address(router), params.amountA);
+        IERC20(params.tokenB).approve(address(router), params.amountB);
+
+        (amountAActual, amountBActual, liquidity) = router.addLiquidity(
+            params.tokenA,
+            params.tokenB,
+            params.amountA,
+            params.amountB,
+            params.amountAMin,
+            params.amountBMin,
+            params.to,
+            params.deadline
+        );
+
         _refundRemaining(params.tokenA);
         _refundRemaining(params.tokenB);
     }

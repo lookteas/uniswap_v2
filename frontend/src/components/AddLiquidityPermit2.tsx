@@ -5,9 +5,9 @@ import { CONTRACTS, ERC20_ABI, FACTORY_ABI, PERMIT2_ROUTER_ABI } from '../config
 import { TOKENS } from '../config/tokens';
 
 // Permit2 SignatureTransfer 类型定义
-const PERMIT2_TRANSFER_TYPES = {
-  PermitTransferFrom: [
-    { name: 'permitted', type: 'TokenPermissions' },
+const PERMIT2_BATCH_TRANSFER_TYPES = {
+  PermitBatchTransferFrom: [
+    { name: 'permitted', type: 'TokenPermissions[]' },
     { name: 'spender', type: 'address' },
     { name: 'nonce', type: 'uint256' },
     { name: 'deadline', type: 'uint256' },
@@ -83,7 +83,7 @@ export function AddLiquidityPermit2() {
   useEffect(() => {
     if (isSuccess) {
       refetchTokenData();
-      setPermit2NonceBase((prev) => prev + BigInt(2));
+      setPermit2NonceBase((prev) => prev + BigInt(1));
       // 延迟重置，让用户看到成功提示
       setTimeout(() => reset(), 3000);
     }
@@ -135,8 +135,7 @@ export function AddLiquidityPermit2() {
     
     try {
       const deadline = BigInt(Math.floor(Date.now() / 1000) + 1800); // 30 分钟
-      const nonceA = permit2NonceBase;
-      const nonceB = permit2NonceBase + BigInt(1);
+      const nonce = permit2NonceBase;
       
       // Permit2 domain
       const permit2Domain = {
@@ -144,46 +143,29 @@ export function AddLiquidityPermit2() {
         chainId: chainId,
         verifyingContract: CONTRACTS.PERMIT2,
       };
-      
-      // 签名 Token A
-      const signatureA = await signTypedDataAsync({
+
+      const signature = await signTypedDataAsync({
         domain: permit2Domain,
-        types: PERMIT2_TRANSFER_TYPES,
-        primaryType: 'PermitTransferFrom',
+        types: PERMIT2_BATCH_TRANSFER_TYPES,
+        primaryType: 'PermitBatchTransferFrom',
         message: {
-          permitted: {
-            token: tokenA.address,
-            amount: amountAWei,
-          },
+          permitted: [
+            { token: tokenA.address, amount: amountAWei },
+            { token: tokenB.address, amount: amountBWei },
+          ],
           spender: CONTRACTS.PERMIT2_ROUTER,
-          nonce: nonceA,
-          deadline: deadline,
-        },
-      });
-      setIsSigningA(false);
-      
-      // 签名 Token B
-      const signatureB = await signTypedDataAsync({
-        domain: permit2Domain,
-        types: PERMIT2_TRANSFER_TYPES,
-        primaryType: 'PermitTransferFrom',
-        message: {
-          permitted: {
-            token: tokenB.address,
-            amount: amountBWei,
-          },
-          spender: CONTRACTS.PERMIT2_ROUTER,
-          nonce: nonceB,
+          nonce: nonce,
           deadline: deadline,
         },
       });
       setIsSigningB(false);
+      setIsSigningA(false);
       
       // 调用 Permit2Router 添加流动性
       writeContract({
         address: CONTRACTS.PERMIT2_ROUTER,
         abi: PERMIT2_ROUTER_ABI,
-        functionName: 'addLiquidityWithPermit2',
+        functionName: 'addLiquidityWithPermit2Batch',
         args: [
           {
             tokenA: tokenA.address,
@@ -196,10 +178,8 @@ export function AddLiquidityPermit2() {
             deadline: deadline,
           },
           {
-            nonceA: nonceA,
-            nonceB: nonceB,
-            signatureA: signatureA,
-            signatureB: signatureB,
+            nonce: nonce,
+            signature: signature,
           },
         ],
         gas: gasLimit,

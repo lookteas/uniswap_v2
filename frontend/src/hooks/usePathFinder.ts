@@ -9,11 +9,11 @@ export interface SwapPath {
   amountOut: bigint;
 }
 
-// 生成所有可能的路径 (最多 3 跳)
+// 生成所有可能的路径 (最多 4 跳)
 export function generatePaths(tokenIn: Token, tokenOut: Token, allTokens: Token[]): Token[][] {
   const paths: Token[][] = [];
   
-  // 直接路径: A -> B
+  // 直接路径: A -> B (1 跳)
   paths.push([tokenIn, tokenOut]);
   
   // 2 跳路径: A -> X -> B
@@ -33,6 +33,27 @@ export function generatePaths(tokenIn: Token, tokenOut: Token, allTokens: Token[
         mid2.address === mid1.address
       ) continue;
       paths.push([tokenIn, mid1, mid2, tokenOut]);
+    }
+  }
+  
+  // 4 跳路径: A -> X -> Y -> Z -> B
+  for (const mid1 of allTokens) {
+    if (mid1.address === tokenIn.address || mid1.address === tokenOut.address) continue;
+    for (const mid2 of allTokens) {
+      if (
+        mid2.address === tokenIn.address ||
+        mid2.address === tokenOut.address ||
+        mid2.address === mid1.address
+      ) continue;
+      for (const mid3 of allTokens) {
+        if (
+          mid3.address === tokenIn.address ||
+          mid3.address === tokenOut.address ||
+          mid3.address === mid1.address ||
+          mid3.address === mid2.address
+        ) continue;
+        paths.push([tokenIn, mid1, mid2, mid3, tokenOut]);
+      }
     }
   }
   

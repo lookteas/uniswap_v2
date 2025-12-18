@@ -314,11 +314,20 @@ export function SwapPermit2() {
                   className={`path-item ${selectedPathIndex === idx ? 'selected' : ''}`}
                   onClick={() => setSelectedPathIndex(idx)}
                 >
-                  <span className="path-route">{formatPath(p.path)}</span>
-                  <span className="path-output">
-                    {parseFloat(formatUnits(p.amountOut, 18)).toFixed(6)} {tokenOut.symbol}
-                  </span>
-                  {idx === 0 && <span className="best-tag">最优</span>}
+                  <div className="path-route">
+                    {p.path.map((token, i) => (
+                      <span key={token.address}>
+                        <span className="token-label">{token.symbol}</span>
+                        {i < p.path.length - 1 && <span className="path-arrow">→</span>}
+                      </span>
+                    ))}
+                  </div>
+                  <div className="path-item-bottom">
+                    <span className="path-output">
+                      {parseFloat(formatUnits(p.amountOut, 18)).toFixed(6)} {tokenOut.symbol}
+                    </span>
+                    {idx === 0 && <span className="best-tag">最优</span>}
+                  </div>
                 </div>
               ))}
             </div>

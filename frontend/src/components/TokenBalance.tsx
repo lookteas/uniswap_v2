@@ -116,22 +116,31 @@ export function TokenBalance() {
       {/* 代币余额 */}
       {activeSection === 'balance' && (
         <div className="card balance-section">
-          <h3>💰 代币余额</h3>
-          <div className="balance-grid">
+          <div className="section-header">
+            <h3>💰 代币余额</h3>
+            <span className="item-count">{TOKENS.length} 种代币</span>
+          </div>
+          <div className="list-header">
+            <span className="col-token">代币</span>
+            <span className="col-balance">余额</span>
+          </div>
+          <div className="scrollable-list">
             {TOKENS.map((token, idx) => {
               const balance = balances?.[idx]?.result as bigint | undefined;
               const formattedBalance = balance ? parseFloat(formatUnits(balance, token.decimals)) : 0;
               return (
-                <div className="balance-card" key={token.address}>
-                  <div className="balance-card-header">
-                    <span className="token-symbol">{token.symbol}</span>
-                    <span className="token-name-small">{token.name}</span>
+                <div className="list-row" key={token.address}>
+                  <div className="col-token">
+                    <span className="token-icon">{token.symbol.charAt(0)}</span>
+                    <div className="token-info">
+                      <span className="token-symbol">{token.symbol}</span>
+                      <span className="token-name-small">{token.name}</span>
+                    </div>
                   </div>
-                  <div className="balance-card-value">
-                    {formattedBalance.toLocaleString(undefined, { maximumFractionDigits: 4 })}
-                  </div>
-                  <div className="balance-card-address">
-                    {token.address.slice(0, 6)}...{token.address.slice(-4)}
+                  <div className="col-balance">
+                    <span className="balance-value">
+                      {formattedBalance.toLocaleString(undefined, { maximumFractionDigits: 4 })}
+                    </span>
                   </div>
                 </div>
               );
@@ -143,31 +152,44 @@ export function TokenBalance() {
       {/* LP 代币 */}
       {activeSection === 'lp' && (
         <div className="card balance-section">
-          <h3>🪙 LP 代币持仓</h3>
+          <div className="section-header">
+            <h3>🪙 LP 代币持仓</h3>
+            <span className="item-count">{pairInfos.length} 个池子</span>
+          </div>
           {pairInfos.length === 0 ? (
             <div className="empty-state">暂无 LP 代币持仓</div>
           ) : (
-            <div className="lp-grid">
-              {pairInfos.map((pair, idx) => {
-                const lpBalance = pair.lpBalance ? parseFloat(formatUnits(pair.lpBalance, 18)) : 0;
-                const totalSupply = pair.totalSupply ? parseFloat(formatUnits(pair.totalSupply, 18)) : 0;
-                const sharePercent = totalSupply > 0 ? (lpBalance / totalSupply * 100) : 0;
-                return (
-                  <div className="lp-card" key={idx}>
-                    <div className="lp-card-header">
-                      <span className="lp-pair">{pair.tokenA.symbol}/{pair.tokenB.symbol}</span>
-                      <span className="lp-share">{sharePercent.toFixed(2)}% 份额</span>
+            <>
+              <div className="list-header">
+                <span className="col-pair">交易对</span>
+                <span className="col-lp">LP 数量</span>
+                <span className="col-share">份额</span>
+              </div>
+              <div className="scrollable-list">
+                {pairInfos.map((pair, idx) => {
+                  const lpBalance = pair.lpBalance ? parseFloat(formatUnits(pair.lpBalance, 18)) : 0;
+                  const totalSupply = pair.totalSupply ? parseFloat(formatUnits(pair.totalSupply, 18)) : 0;
+                  const sharePercent = totalSupply > 0 ? (lpBalance / totalSupply * 100) : 0;
+                  return (
+                    <div className="list-row" key={idx}>
+                      <div className="col-pair">
+                        <span className="pair-icons">
+                          <span className="token-icon small">{pair.tokenA.symbol.charAt(0)}</span>
+                          <span className="token-icon small overlap">{pair.tokenB.symbol.charAt(0)}</span>
+                        </span>
+                        <span className="pair-name">{pair.tokenA.symbol}/{pair.tokenB.symbol}</span>
+                      </div>
+                      <div className="col-lp">
+                        {lpBalance.toLocaleString(undefined, { maximumFractionDigits: 4 })}
+                      </div>
+                      <div className="col-share">
+                        {sharePercent.toFixed(2)}%
+                      </div>
                     </div>
-                    <div className="lp-card-value">
-                      {lpBalance.toLocaleString(undefined, { maximumFractionDigits: 6 })}
-                    </div>
-                    <div className="lp-card-info">
-                      总供应: {totalSupply.toLocaleString(undefined, { maximumFractionDigits: 2 })}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+                  );
+                })}
+              </div>
+            </>
           )}
         </div>
       )}
@@ -175,40 +197,51 @@ export function TokenBalance() {
       {/* 池子储备 */}
       {activeSection === 'reserves' && (
         <div className="card balance-section">
-          <h3>📊 池子储备</h3>
+          <div className="section-header">
+            <h3>📊 池子储备</h3>
+            <span className="item-count">{pairInfos.length} 个池子</span>
+          </div>
           {pairInfos.length === 0 ? (
             <div className="empty-state">暂无可用交易对</div>
           ) : (
-            <div className="reserves-grid">
-              {pairInfos.map((pair, idx) => {
-                // 根据代币地址排序确定正确的储备顺序
-                const isTokenAFirst = pair.tokenA.address.toLowerCase() < pair.tokenB.address.toLowerCase();
-                const reserveA = pair.reserves?.[isTokenAFirst ? 0 : 1] ? parseFloat(formatUnits(pair.reserves[isTokenAFirst ? 0 : 1], 18)) : 0;
-                const reserveB = pair.reserves?.[isTokenAFirst ? 1 : 0] ? parseFloat(formatUnits(pair.reserves[isTokenAFirst ? 1 : 0], 18)) : 0;
-                const price = reserveA > 0 ? reserveB / reserveA : 0;
-                return (
-                  <div className="reserve-card" key={idx}>
-                    <div className="reserve-card-header">
-                      <span className="reserve-pair">{pair.tokenA.symbol}/{pair.tokenB.symbol}</span>
+            <>
+              <div className="list-header reserves-header">
+                <span className="col-pair">交易对</span>
+                <span className="col-reserve">储备 A</span>
+                <span className="col-reserve">储备 B</span>
+                <span className="col-price">价格</span>
+              </div>
+              <div className="scrollable-list">
+                {pairInfos.map((pair, idx) => {
+                  const isTokenAFirst = pair.tokenA.address.toLowerCase() < pair.tokenB.address.toLowerCase();
+                  const reserveA = pair.reserves?.[isTokenAFirst ? 0 : 1] ? parseFloat(formatUnits(pair.reserves[isTokenAFirst ? 0 : 1], 18)) : 0;
+                  const reserveB = pair.reserves?.[isTokenAFirst ? 1 : 0] ? parseFloat(formatUnits(pair.reserves[isTokenAFirst ? 1 : 0], 18)) : 0;
+                  const price = reserveA > 0 ? reserveB / reserveA : 0;
+                  return (
+                    <div className="list-row reserves-row" key={idx}>
+                      <div className="col-pair">
+                        <span className="pair-icons">
+                          <span className="token-icon small">{pair.tokenA.symbol.charAt(0)}</span>
+                          <span className="token-icon small overlap">{pair.tokenB.symbol.charAt(0)}</span>
+                        </span>
+                        <span className="pair-name">{pair.tokenA.symbol}/{pair.tokenB.symbol}</span>
+                      </div>
+                      <div className="col-reserve">
+                        <span className="reserve-amount">{reserveA.toLocaleString(undefined, { maximumFractionDigits: 2 })}</span>
+                        <span className="reserve-symbol">{pair.tokenA.symbol}</span>
+                      </div>
+                      <div className="col-reserve">
+                        <span className="reserve-amount">{reserveB.toLocaleString(undefined, { maximumFractionDigits: 2 })}</span>
+                        <span className="reserve-symbol">{pair.tokenB.symbol}</span>
+                      </div>
+                      <div className="col-price">
+                        {price.toFixed(4)}
+                      </div>
                     </div>
-                    <div className="reserve-details">
-                      <div className="reserve-row">
-                        <span className="reserve-label">{pair.tokenA.symbol}</span>
-                        <span className="reserve-value">{reserveA.toLocaleString(undefined, { maximumFractionDigits: 4 })}</span>
-                      </div>
-                      <div className="reserve-row">
-                        <span className="reserve-label">{pair.tokenB.symbol}</span>
-                        <span className="reserve-value">{reserveB.toLocaleString(undefined, { maximumFractionDigits: 4 })}</span>
-                      </div>
-                      <div className="reserve-row price-row">
-                        <span className="reserve-label">价格</span>
-                        <span className="reserve-value">1 {pair.tokenA.symbol} = {price.toFixed(4)} {pair.tokenB.symbol}</span>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+                  );
+                })}
+              </div>
+            </>
           )}
         </div>
       )}

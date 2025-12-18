@@ -5,50 +5,52 @@ export const CONTRACTS = {
   WETH: '0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9' as const,
   // Permit2 相关
   PERMIT2: '0x000000000022D473030F116dDEE9F6B43aC78BA3' as const,
-  PERMIT2_ROUTER: '0x5C40c3d38ded95eFEe4f2daA58A5547eDD4e97fF' as const,
+  PERMIT2_ROUTER: '0x23F77d19fA26514C8053958ca8cD95FF73D22372' as const,
+  // Faucet 水龙头 (部署后替换此地址)
+  FAUCET: '0xf641f31d368B61F366672EB88F3a033ACC5DD27d' as const,
 };
 
 // ERC20 ABI
 export const ERC20_ABI = [
   {
-    constant: true,
     inputs: [{ name: '_owner', type: 'address' }],
     name: 'balanceOf',
     outputs: [{ name: 'balance', type: 'uint256' }],
+    stateMutability: 'view',
     type: 'function',
   },
   {
-    constant: true,
     inputs: [
       { name: '_owner', type: 'address' },
       { name: '_spender', type: 'address' },
     ],
     name: 'allowance',
     outputs: [{ name: '', type: 'uint256' }],
+    stateMutability: 'view',
     type: 'function',
   },
   {
-    constant: false,
     inputs: [
       { name: '_spender', type: 'address' },
       { name: '_value', type: 'uint256' },
     ],
     name: 'approve',
     outputs: [{ name: '', type: 'bool' }],
+    stateMutability: 'nonpayable',
     type: 'function',
   },
   {
-    constant: true,
     inputs: [],
     name: 'symbol',
     outputs: [{ name: '', type: 'string' }],
+    stateMutability: 'view',
     type: 'function',
   },
   {
-    constant: true,
     inputs: [],
     name: 'decimals',
     outputs: [{ name: '', type: 'uint8' }],
+    stateMutability: 'view',
     type: 'function',
   },
 ] as const;
@@ -114,6 +116,101 @@ export const ROUTER_ABI = [
     name: 'getAmountsOut',
     outputs: [{ name: 'amounts', type: 'uint256[]' }],
     stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      { name: 'amountOutMin', type: 'uint256' },
+      { name: 'path', type: 'address[]' },
+      { name: 'to', type: 'address' },
+      { name: 'deadline', type: 'uint256' },
+    ],
+    name: 'swapExactETHForTokens',
+    outputs: [{ name: 'amounts', type: 'uint256[]' }],
+    stateMutability: 'payable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      { name: 'amountIn', type: 'uint256' },
+      { name: 'amountOutMin', type: 'uint256' },
+      { name: 'path', type: 'address[]' },
+      { name: 'to', type: 'address' },
+      { name: 'deadline', type: 'uint256' },
+    ],
+    name: 'swapExactTokensForETH',
+    outputs: [{ name: 'amounts', type: 'uint256[]' }],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      { name: 'token', type: 'address' },
+      { name: 'amountTokenDesired', type: 'uint256' },
+      { name: 'amountTokenMin', type: 'uint256' },
+      { name: 'amountETHMin', type: 'uint256' },
+      { name: 'to', type: 'address' },
+      { name: 'deadline', type: 'uint256' },
+    ],
+    name: 'addLiquidityETH',
+    outputs: [
+      { name: 'amountToken', type: 'uint256' },
+      { name: 'amountETH', type: 'uint256' },
+      { name: 'liquidity', type: 'uint256' },
+    ],
+    stateMutability: 'payable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      { name: 'token', type: 'address' },
+      { name: 'liquidity', type: 'uint256' },
+      { name: 'amountTokenMin', type: 'uint256' },
+      { name: 'amountETHMin', type: 'uint256' },
+      { name: 'to', type: 'address' },
+      { name: 'deadline', type: 'uint256' },
+    ],
+    name: 'removeLiquidityETH',
+    outputs: [
+      { name: 'amountToken', type: 'uint256' },
+      { name: 'amountETH', type: 'uint256' },
+    ],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+] as const;
+
+// WETH ABI
+export const WETH_ABI = [
+  {
+    inputs: [],
+    name: 'deposit',
+    outputs: [],
+    stateMutability: 'payable',
+    type: 'function',
+  },
+  {
+    inputs: [{ name: 'wad', type: 'uint256' }],
+    name: 'withdraw',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [{ name: 'account', type: 'address' }],
+    name: 'balanceOf',
+    outputs: [{ name: '', type: 'uint256' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      { name: 'spender', type: 'address' },
+      { name: 'amount', type: 'uint256' },
+    ],
+    name: 'approve',
+    outputs: [{ name: '', type: 'bool' }],
+    stateMutability: 'nonpayable',
     type: 'function',
   },
 ] as const;
@@ -306,6 +403,40 @@ export const PERMIT2_ROUTER_ABI = [
     inputs: [
       {
         components: [
+          { name: 'tokenA', type: 'address' },
+          { name: 'tokenB', type: 'address' },
+          { name: 'amountA', type: 'uint256' },
+          { name: 'amountB', type: 'uint256' },
+          { name: 'amountAMin', type: 'uint256' },
+          { name: 'amountBMin', type: 'uint256' },
+          { name: 'to', type: 'address' },
+          { name: 'deadline', type: 'uint256' },
+        ],
+        name: 'params',
+        type: 'tuple',
+      },
+      {
+        components: [
+          { name: 'nonce', type: 'uint256' },
+          { name: 'signature', type: 'bytes' },
+        ],
+        name: 'permit2',
+        type: 'tuple',
+      },
+    ],
+    name: 'addLiquidityWithPermit2Batch',
+    outputs: [
+      { name: 'amountAActual', type: 'uint256' },
+      { name: 'amountBActual', type: 'uint256' },
+      { name: 'liquidity', type: 'uint256' },
+    ],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        components: [
           { name: 'amountIn', type: 'uint256' },
           { name: 'amountOutMin', type: 'uint256' },
           { name: 'path', type: 'address[]' },
@@ -361,6 +492,52 @@ export const PERMIT2_ROUTER_ABI = [
       { name: 'amountB', type: 'uint256' },
     ],
     stateMutability: 'nonpayable',
+    type: 'function',
+  },
+] as const;
+
+// Faucet ABI
+export const FAUCET_ABI = [
+  {
+    inputs: [{ name: 'user', type: 'address' }],
+    name: 'canClaim',
+    outputs: [{ name: '', type: 'bool' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'claimAmount',
+    outputs: [{ name: '', type: 'uint256' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'claim',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'getTokens',
+    outputs: [{ name: '', type: 'address[]' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'getTokenCount',
+    outputs: [{ name: '', type: 'uint256' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [{ name: 'token', type: 'address' }],
+    name: 'getTokenBalance',
+    outputs: [{ name: '', type: 'uint256' }],
+    stateMutability: 'view',
     type: 'function',
   },
 ] as const;
