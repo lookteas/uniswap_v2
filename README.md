@@ -8,16 +8,33 @@
 ├── src/
 │   ├── v2-core/          # Uniswap V2 核心合约 (Solidity 0.5.16)
 │   ├── v2-periphery/     # Uniswap V2 外围合约 (Solidity 0.6.6)
+│   ├── Permit2Router.sol # Permit2 包装合约
+│   ├── TestToken.sol     # 测试代币 (支持 ERC-2612 Permit)
 │   └── WETH9.sol         # WETH 合约 (本地测试用)
 ├── script/
-│   ├── DeployUniswapV2.s.sol    # 完整部署脚本
-│   ├── 01_DeployFactory.s.sol   # 分步部署 - Factory
-│   ├── 02_DeployRouter.s.sol    # 分步部署 - Router
-│   └── 03_DeployWETH.s.sol      # 分步部署 - WETH
+│   ├── DeployUniswapV2.s.sol       # 完整部署脚本
+│   ├── DeployPermit2Router.s.sol   # Permit2Router 部署脚本
+│   ├── DeployTokens.s.sol          # 测试代币部署脚本
+│   ├── 01_DeployFactory.s.sol      # 分步部署 - Factory
+│   ├── 02_DeployRouter.s.sol       # 分步部署 - Router
+│   └── 03_DeployWETH.s.sol         # 分步部署 - WETH
+├── frontend/                        # React 前端应用
+│   └── src/
+│       ├── components/
+│       │   ├── AddLiquidity.tsx         # 添加流动性 (ERC-2612 Permit)
+│       │   ├── AddLiquidityPermit2.tsx  # 添加流动性 (Permit2)
+│       │   ├── MultiHopSwap.tsx         # 多跳兑换
+│       │   └── RemoveLiquidity.tsx      # 移除流动性
+│       └── config/
+│           ├── contracts.ts   # 合约地址和 ABI
+│           └── tokens.ts      # 代币配置
+├── docs/
+│   ├── DEBUG_ADDLIQUIDITY.md  # 调试记录
+│   └── PERMIT2.md             # Permit2 集成文档
 ├── test/
-│   └── UniswapV2.t.sol          # 集成测试
-├── DEPLOYMENT.md                 # 详细部署文档
-└── foundry.toml                  # Foundry 配置
+│   └── UniswapV2.t.sol        # 集成测试
+├── DEPLOYMENT.md              # 详细部署文档
+└── foundry.toml               # Foundry 配置
 ```
 
 ## 快速开始
@@ -96,6 +113,16 @@ forge script script/DeployUniswapV2.s.sol:DeployUniswapV2 \
 | Factory | `0x9A267db279FE7d11138f9293784460Df577c3198` |
 | Router | `0x3c66Fe68778281be4358F21BfB63aE9cD242aB58` |
 | WETH | `0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9` |
+| Permit2Router | `0xDC6481b5b572654E16213781f2f6106D65860a01` |
+
+### 测试代币
+
+| 代币 | 地址 |
+|------|------|
+| TKA | `0x89349c29eAb08674Ccb243aEf113c28847fB5215` |
+| TKB | `0x92e90F895172CDc96BB0985BC56f0cA4874aEd79` |
+| TKC | `0x7Ca1a37CD0dE6f2bf06c09Da57bEa14344BfBa25` |
+| TKD | `0x4dDCabc42aAF3403e300413F3b8AD909F58785b1` |
 
 **Init Code Hash**: `0x25aad938d8616b6e59148d3e701e4966de4418a752233589352d7c616a256568`
 
@@ -103,7 +130,9 @@ forge script script/DeployUniswapV2.s.sol:DeployUniswapV2 \
 
 ## 详细文档
 
-详细部署文档请查看 [DEPLOYMENT.md](./DEPLOYMENT.md) 获取完整的部署和测试指南。
+- [DEPLOYMENT.md](./DEPLOYMENT.md) - 完整的部署和测试指南
+- [docs/PERMIT2.md](./docs/PERMIT2.md) - Permit2 集成文档
+- [docs/DEBUG_ADDLIQUIDITY.md](./docs/DEBUG_ADDLIQUIDITY.md) - 调试记录
 
 ## Foundry 命令参考
 

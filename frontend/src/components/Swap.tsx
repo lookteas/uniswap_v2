@@ -2,15 +2,19 @@ import { useState } from 'react';
 import { useAccount, useReadContract, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
 import { parseUnits, formatUnits } from 'viem';
 import { CONTRACTS, ERC20_ABI, ROUTER_ABI } from '../config/contracts';
+import { TOKENS } from '../config/tokens';
 
 export function Swap() {
   const { address } = useAccount();
   const [amountIn, setAmountIn] = useState('');
-  const [tokenIn, setTokenIn] = useState<'A' | 'B'>('A');
+  const [tokenInIndex, setTokenInIndex] = useState(0);
+  const [tokenOutIndex] = useState(1);
   const [slippage] = useState(0.5); // 0.5% slippage
 
-  const tokenInAddress = tokenIn === 'A' ? CONTRACTS.TOKEN_A : CONTRACTS.TOKEN_B;
-  const tokenOutAddress = tokenIn === 'A' ? CONTRACTS.TOKEN_B : CONTRACTS.TOKEN_A;
+  const tokenIn = TOKENS[tokenInIndex];
+  const tokenOut = TOKENS[tokenOutIndex];
+  const tokenInAddress = tokenIn.address;
+  const tokenOutAddress = tokenOut.address;
 
   // 查询授权额度
   const { data: allowance, refetch: refetchAllowance } = useReadContract({
@@ -82,9 +86,12 @@ export function Swap() {
               min="0"
               step="0.1"
             />
-            <select value={tokenIn} onChange={(e) => setTokenIn(e.target.value as 'A' | 'B')}>
-              <option value="A">TKA</option>
-              <option value="B">TKB</option>
+            <select value={tokenInIndex} onChange={(e) => setTokenInIndex(Number(e.target.value))}>
+              {TOKENS.map((token, index) => (
+                <option key={token.address} value={index} disabled={index === tokenOutIndex}>
+                  {token.symbol}
+                </option>
+              ))}
             </select>
           </div>
         </div>
@@ -95,7 +102,7 @@ export function Swap() {
           <label>预估输出</label>
           <div className="output-display">
             <span className="output-value">{parseFloat(estimatedOutput).toFixed(6)}</span>
-            <span className="output-token">{tokenIn === 'A' ? 'TKB' : 'TKA'}</span>
+            <span className="output-token">{tokenOut.symbol}</span>
           </div>
         </div>
 
@@ -109,7 +116,7 @@ export function Swap() {
             disabled={isPending || isConfirming}
             className="btn btn-primary"
           >
-            {isPending || isConfirming ? '处理中...' : `授权 ${tokenIn === 'A' ? 'TKA' : 'TKB'}`}
+            {isPending || isConfirming ? '处理中...' : `授权 ${tokenIn.symbol}`}
           </button>
         ) : (
           <button

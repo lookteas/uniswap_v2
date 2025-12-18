@@ -3,14 +3,19 @@ import { useAccount } from 'wagmi'
 import { ConnectWallet } from './components/ConnectWallet'
 import { TokenBalance } from './components/TokenBalance'
 import { MultiHopSwap } from './components/MultiHopSwap'
+import { SwapPermit2 } from './components/SwapPermit2'
 import { AddLiquidity } from './components/AddLiquidity'
+import { AddLiquidityPermit2 } from './components/AddLiquidityPermit2'
 import { RemoveLiquidity } from './components/RemoveLiquidity'
+import { RemoveLiquidityPermit2 } from './components/RemoveLiquidityPermit2'
 import './App.css'
 
 type Tab = 'swap' | 'add' | 'remove' | 'balance'
 
 function App() {
   const [activeTab, setActiveTab] = useState<Tab>('swap')
+  const [usePermit2, setUsePermit2] = useState(true) // 默认使用 Permit2
+  const [showSettings, setShowSettings] = useState(false)
   const { isConnected } = useAccount()
 
   return (
@@ -18,7 +23,12 @@ function App() {
       <header className="header">
         <h1>🦄 Uniswap V2 DEX</h1>
         <p className="subtitle">Sepolia 测试网</p>
-        <ConnectWallet />
+        <ConnectWallet 
+          usePermit2={usePermit2}
+          setUsePermit2={setUsePermit2}
+          showSettings={showSettings}
+          setShowSettings={setShowSettings}
+        />
       </header>
 
       <main className="main">
@@ -51,9 +61,9 @@ function App() {
 
         {isConnected ? (
           <div className="tab-content">
-            {activeTab === 'swap' && <MultiHopSwap />}
-            {activeTab === 'add' && <AddLiquidity />}
-            {activeTab === 'remove' && <RemoveLiquidity />}
+            {activeTab === 'swap' && (usePermit2 ? <SwapPermit2 /> : <MultiHopSwap />)}
+            {activeTab === 'add' && (usePermit2 ? <AddLiquidityPermit2 /> : <AddLiquidity />)}
+            {activeTab === 'remove' && (usePermit2 ? <RemoveLiquidityPermit2 /> : <RemoveLiquidity />)}
             {activeTab === 'balance' && <TokenBalance />}
           </div>
         ) : (

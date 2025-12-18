@@ -92,10 +92,20 @@ export function AddLiquidity() {
   useEffect(() => {
     if (isSuccess && lastApprovedToken) {
       refetchTokenData();
-      reset();
       setLastApprovedToken(null);
+      // 延迟重置，让用户看到成功提示
+      setTimeout(() => reset(), 3000);
     }
   }, [isSuccess, lastApprovedToken, refetchTokenData, reset]);
+
+  // 切换代币时重置状态
+  useEffect(() => {
+    reset();
+    setAmountA('');
+    setAmountB('');
+    setPermitSignatureA(null);
+    setPermitSignatureB(null);
+  }, [tokenAIndex, tokenBIndex, reset]);
 
   const amountAWei = amountA ? parseUnits(amountA, 18) : BigInt(0);
   const amountBWei = amountB ? parseUnits(amountB, 18) : BigInt(0);
