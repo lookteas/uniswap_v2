@@ -146,7 +146,7 @@ forge script script/DeployUniswapV2.s.sol:DeployUniswapV2 \
 
 - [DEPLOYMENT.md](./DEPLOYMENT.md) - 完整的部署和测试指南
 - [docs/PERMIT2.md](./docs/PERMIT2.md) - Permit2 集成文档
-- [docs/FRONTEND_FEATURES.md](./docs/FRONTEND_FEATURES.md) - 前端功能文档
+- [frontend/README.md](./frontend/README.md) - 前端功能文档
 - [docs/DEBUG_ADDLIQUIDITY.md](./docs/DEBUG_ADDLIQUIDITY.md) - 调试记录
 
 ## Foundry 命令参考
